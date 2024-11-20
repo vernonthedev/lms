@@ -344,23 +344,43 @@
 			}
 		}
 		
-		// function to retrieve the borrower history content from the db
+		// // function to retrieve the borrower history content from the db
+		// public function display_borrower_history($borrower_id) {
+		// 	$query = $this->conn->prepare("
+		// 		SELECT bh.*, b.firstname, b.lastname, l.ref_no
+		// 		FROM `borrower_history` bh
+		// 		JOIN `borrower` b ON bh.borrower_id = b.borrower_id
+		// 		JOIN `loan` l ON bh.loan_id = l.loan_id
+		// 		WHERE bh.borrower_id = ?
+		// 		ORDER BY bh.payment_date DESC
+		// 	") or die($this->conn->error);
+		// 	$query->bind_param("i", $borrower_id);
+		
+		// 	if ($query->execute()) {
+		// 		$result = $query->get_result();
+		// 		return $result;
+		// 	}
+		// }
+
 		public function display_borrower_history($borrower_id) {
 			$query = $this->conn->prepare("
-				SELECT bh.*, b.firstname, b.lastname, l.ref_no
+				SELECT bh.*, b.firstname, b.lastname, l.ref_no, 
+					   IFNULL(bh.payment_date, l.date_created) AS payment_date
 				FROM `borrower_history` bh
 				JOIN `borrower` b ON bh.borrower_id = b.borrower_id
 				JOIN `loan` l ON bh.loan_id = l.loan_id
 				WHERE bh.borrower_id = ?
-				ORDER BY bh.payment_date DESC
+				ORDER BY payment_date DESC
 			") or die($this->conn->error);
+			
 			$query->bind_param("i", $borrower_id);
-		
+			
 			if ($query->execute()) {
 				$result = $query->get_result();
 				return $result;
 			}
 		}
+		
 		
 	}
 ?>
